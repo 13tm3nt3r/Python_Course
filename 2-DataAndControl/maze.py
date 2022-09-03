@@ -14,20 +14,26 @@ MAP_HEIGHT = 15
 # List of lists where the different obstacles are going to be spawned
 OBSTACLES_N = 10
 map_objects = []
+# New list to represent my tail
+tail = []
+tail_length = 0
+
 my_position = [0, 0]
 
 
 def random_obstacle():
-    for obs in range(OBSTACLES_N):
+    obs = 0
+    while obs != OBSTACLES_N:
         new_position = [random.randint(0, MAP_WIDTH - 1), random.randint(0, MAP_HEIGHT - 1)]
         # Check if there are repeated coordinates and if my_position != new_position
         if (new_position not in map_objects) and (new_position != my_position):
             map_objects.append(new_position)
+            obs += 1
 
     return map_objects
 
 
-def print_map(pos, map_objs):
+def print_map(pos, map_objs, tail_length):
     # Output a line, the height of the map:
     print("+" + "-" * (MAP_WIDTH * 3) + "+")
     for y in range(MAP_HEIGHT):
@@ -47,9 +53,15 @@ def print_map(pos, map_objs):
                     if (map_object[POS_X] == pos[POS_X]) and (map_object[POS_Y] == pos[POS_Y]):
                         # Convert to an empty sub_list
                         map_objs.pop(i)
+                        # tail.append(0, i)
+                        tail_length += 1
                     else:
                         char_to_draw = "*"
                 i += 1
+
+            for tail_item in tail:
+                if (x == tail_item[POS_X]) and (y == tail_item[POS_Y]):
+                    char_to_draw = "@"
 
             # Put a @ in the position given in my_position:
             if (x == pos[POS_X]) and (y == pos[POS_Y]):
@@ -63,43 +75,9 @@ def print_map(pos, map_objs):
         print("|")
     print("+" + "-" * (MAP_WIDTH * 3) + "+")
 
+    print("The length of my tail is {}".format(tail_length))
 
-# Interactive movement (WASD):
-# direction = input("Where do you want to move next? (WASD): ")
-def interactive_mov(pos):
-    direction = readchar.readchar()
-
-    if direction == "w":
-        pos[POS_Y] -= 1
-        # When user goes from down to up and viceversa (Y axis)
-        # if pos[POS_Y] < 0:
-        #     pos[POS_Y] = (MAP_HEIGHT - 1)
-        pos[POS_Y] %= MAP_HEIGHT
-
-    elif direction == "s":
-        pos[POS_Y] += 1
-        # if pos[POS_Y] > (MAP_HEIGHT - 1):
-        #     pos[POS_Y] = 0
-        pos[POS_Y] %= MAP_HEIGHT
-
-    elif direction == "a":
-        pos[POS_X] -= 1
-        # When user goes from left to right and viceversa (X axis)
-        # if pos[POS_X] < 0:
-        #     pos[POS_X] = MAP_WIDTH - 1
-        pos[POS_X] %= MAP_WIDTH
-
-    elif direction == "d":
-        pos[POS_X] += 1
-        # if pos[POS_X] > (MAP_WIDTH - 1):
-        #     pos[POS_X] = 0
-        pos[POS_X] %= MAP_WIDTH
-
-    elif direction == "q":
-        print("\n\nBye!!\n")
-        exit(0)
-
-    return pos
+    return tail_length
 
 
 print("\nWELCOME TO THE GAME!")
@@ -107,6 +85,36 @@ print("\nWELCOME TO THE GAME!")
 random_obstacle()
 # Ask the user the next move:
 while True:
-    print_map(my_position, map_objects)
-    my_position = interactive_mov(my_position)
+    tail_length = print_map(my_position, map_objects, tail_length)
+    direction = readchar.readchar()
+
+    # Interactive movement
+    if direction == "w":
+        tail.insert(0, my_position.copy())
+        tail = tail[:tail_length]
+        my_position[POS_Y] -= 1
+        my_position[POS_Y] %= MAP_HEIGHT
+
+    elif direction == "s":
+        tail.insert(0, my_position.copy())
+        tail = tail[:tail_length]
+        my_position[POS_Y] += 1
+        my_position[POS_Y] %= MAP_HEIGHT
+
+    elif direction == "a":
+        tail.insert(0, my_position.copy())
+        tail = tail[:tail_length]
+        my_position[POS_X] -= 1
+        my_position[POS_X] %= MAP_WIDTH
+
+    elif direction == "d":
+        tail.insert(0, my_position.copy())
+        tail = tail[:tail_length]
+        my_position[POS_X] += 1
+        my_position[POS_X] %= MAP_WIDTH
+
+    elif direction == "q":
+        print("\n\nBye!!\n")
+        exit(0)
+
     os.system("cls")
