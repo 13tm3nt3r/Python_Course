@@ -117,4 +117,9 @@ while True:
         print("\n\nBye!!\n")
         exit(0)
 
+    for position in tail:
+        if my_position[POS_X] == position[POS_X] and my_position[POS_Y] == position[POS_Y]:
+            print("\n\nOUCH!! You have died :(\n")
+            exit(0)
+
     os.system("cls")
