@@ -21,8 +21,8 @@ tail_length = 0
 my_position = [0, 0]
 
 
-def random_obstacle():
-    obs = 0
+def random_obstacle(obstacles_list):
+    obs = len(obstacles_list)
     while obs != OBSTACLES_N:
         new_position = [random.randint(0, MAP_WIDTH - 1), random.randint(0, MAP_HEIGHT - 1)]
         # Check if there are repeated coordinates and if my_position != new_position
@@ -51,9 +51,10 @@ def print_map(pos, map_objs, tail_length):
                     # eated_pos = map_object
                     # When my_position == position of an obstacle, it disappears.
                     if (map_object[POS_X] == pos[POS_X]) and (map_object[POS_Y] == pos[POS_Y]):
-                        # Convert to an empty sub_list
+                        # Remove the map_object sublist from map_objs list
                         map_objs.pop(i)
-                        # tail.append(0, i)
+                        # As an obstacle has been removed, create another one
+                        random_obstacle(map_objs)
                         tail_length += 1
                     else:
                         char_to_draw = "*"
@@ -82,7 +83,7 @@ def print_map(pos, map_objs, tail_length):
 
 print("\nWELCOME TO THE GAME!")
 # user_obstacles = int(input("GIVE ME THE NUMBER OF OBSTACLES THAT YOU WANT TO APPEAR IN THE MAP: "))
-random_obstacle()
+random_obstacle(map_objects)
 # Ask the user the next move:
 while True:
     tail_length = print_map(my_position, map_objects, tail_length)
