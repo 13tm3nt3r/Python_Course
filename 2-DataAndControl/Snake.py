@@ -2,11 +2,15 @@
 import readchar
 import os
 import random
+import time
 
 # X axis
 POS_X = 0
 # Y axis
 POS_Y = 1
+# Map dimensions
+MAP_WIDTH = 20
+MAP_HEIGHT = 15
 # List of lists where the different obstacles are going to be spawned
 OBSTACLES_N = 10
 map_objects = []
@@ -14,31 +18,7 @@ map_objects = []
 tail = []
 tail_length = 0
 
-# Obstacle map definition
-obstacle_definition = """\
-############################
-                        ####
-#####################   ####
-#####################   ####
-################            
-####################  ######
-###############          ## 
-########             ####### 
-#############               
-######################   ###
-#####     ########         #
-########                 ###
-######## #########          
-#####    ###########   #### 
-############################\
-"""
-# Create obstacle map
-obstacle_definition = [list(row) for row in obstacle_definition.split("\n")]
-# Map dimensions
-MAP_WIDTH = len(obstacle_definition[0])
-MAP_HEIGHT = len(obstacle_definition)
-
-my_position = [0, 1]
+my_position = [0, 0]
 
 
 def random_obstacle(obstacles_list):
@@ -46,8 +26,7 @@ def random_obstacle(obstacles_list):
     while obs != OBSTACLES_N:
         new_position = [random.randint(0, MAP_WIDTH - 1), random.randint(0, MAP_HEIGHT - 1)]
         # Check if there are repeated coordinates and if my_position != new_position
-        if (new_position not in map_objects) and (new_position != my_position) and \
-                (obstacle_definition[new_position[POS_Y]][new_position[POS_X]] != "#"):
+        if (new_position not in map_objects) and (new_position != my_position):
             map_objects.append(new_position)
             obs += 1
 
@@ -62,7 +41,7 @@ def print_map(pos, map_objs, tail_length):
         print("|", end="")
         for x in range(MAP_WIDTH):
             # By default, a space:
-            char_to_draw = "   "
+            char_to_draw = " "
             # eated_pos = None
 
             i = 0
@@ -78,37 +57,28 @@ def print_map(pos, map_objs, tail_length):
                         random_obstacle(map_objs)
                         tail_length += 1
                     else:
-                        char_to_draw = " * "
+                        char_to_draw = "*"
                 i += 1
 
             for tail_item in tail:
                 if (x == tail_item[POS_X]) and (y == tail_item[POS_Y]):
-                    char_to_draw = " @ "
+                    char_to_draw = "@"
 
             # Put a @ in the position given in my_position:
             if (x == pos[POS_X]) and (y == pos[POS_Y]):
-                char_to_draw = " @ "
-
-            if obstacle_definition[y][x] == "#":
-                char_to_draw = "###"
+                char_to_draw = "@"
 
                 # if eated_pos:
                 #     map_objs.remove(eated_pos)
 
-            print("{}".format(char_to_draw), end="")
+            print(" {} ".format(char_to_draw), end="")
 
         print("|")
     print("+" + "-" * (MAP_WIDTH * 3) + "+")
 
-    print("The length of my tail is {}".format(tail_length+1))
+    print("The length of my tail is {}".format(tail_length))
 
     return tail_length
-
-
-def die(morir):
-    if morir:
-        print("\n\nOUCH!! You have died :(\n")
-        exit(0)
 
 
 print("\nWELCOME TO THE GAME!")
@@ -116,7 +86,6 @@ print("\nWELCOME TO THE GAME!")
 random_obstacle(map_objects)
 # Ask the user the next move:
 while True:
-    morir = False
     tail_length = print_map(my_position, map_objects, tail_length)
     direction = readchar.readchar()
 
@@ -150,9 +119,8 @@ while True:
         exit(0)
 
     for position in tail:
-        if (my_position[POS_X] == position[POS_X] and my_position[POS_Y] == position[POS_Y]) or \
-                obstacle_definition[my_position[POS_Y]][my_position[POS_X]] == "#":
-            morir = True
+        if my_position[POS_X] == position[POS_X] and my_position[POS_Y] == position[POS_Y]:
+            print("\n\nOUCH!! You have died :(\n")
+            exit(0)
 
-    die(morir)
     os.system("cls")
